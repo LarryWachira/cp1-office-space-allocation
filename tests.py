@@ -1,6 +1,4 @@
 import unittest
-from models.persons import Staff, Fellow
-from models.rooms import Office, LivingSpace
 from models.amity import Amity
 
 
@@ -8,34 +6,50 @@ class TestAmity(unittest.TestCase):
 
     def setUp(self):
         self.amity = Amity()
-        Amity.rooms = []
-        Amity.living_spaces = []
-        Amity.offices
+        self.amity.create_room('perl', 'office')
+        self.amity.create_room('oculus', 'o')
+        self.amity.create_room('dojo', 'l')
+        self.amity.create_room('Node', 'living space')
+        self.initial_room_count = len(Amity.rooms)
+        self.initial_office_count = len(Amity.offices)
+        self.initial_living_space_count = len(Amity.living_spaces)
+        self.initial_persons_count = len(Amity.persons)
+        self.initial_staff_count = len(Amity.staff)
+        self.initial_fellow_count = len(Amity.fellows)
 
     def test_create_room(self):
         self.amity.create_room('php', 'office')
-        self.assertEqual(len(Amity.rooms), 1)
-        self.assertEqual(len(Amity.offices), 1)
-        php = Office('php', 'office')
-        self.assertEqual(php.max_capacity, 6)
+        self.amity.create_room('go', 'o')
+        self.amity.create_room('scala', 'l')
+        self.amity.create_room('php', 'living space')
+        self.assertEqual(len(Amity.rooms), self.initial_room_count + 4)
+        self.assertEqual(len(Amity.offices), self.initial_office_count + 2)
+        self.assertEqual(len(Amity.living_spaces),
+                         self.initial_living_space_count + 2)
+        self.assertIn('go', [room.name for room in Amity.offices])
 
-    def test_add_person(self):
-        self.amity.add_person('Lawrence', 'Wachira', 'Fellow')
-        self.assertEqual(len(Amity.persons), 1)
-        self.assertEqual(len(Amity.fellows), 1)
-        dojo = LivingSpace('dojo', 'living space')
-        oculus = Office('Oculus', 'Office')
-        self.amity.add_person('Robert', 'Opiyo', 'Fellow', 'Y')
-        self.assertIn(person_obj, dojo.persons_allocated)
-        self.assertIn(person_obj, oculus.persons_allocated)
-        self.assertRaises(ValueError, self.amity.add_person(),
-                          'Lawrence', 'Wachira', '24')
+    def test_add_staff(self):
+        self.amity.add_staff('Lawrence', 'Wachira')
+        self.amity.add_staff('Lawrence', 'Muchiri')
+        self.amity.add_staff('Lawrence', 'Nyambura')
+        self.amity.add_staff('Lawrence', 'Mutiga')
+        self.assertEqual(len(Amity.persons), self.initial_persons_count + 4)
+        self.assertEqual(len(Amity.staff), self.initial_staff_count + 4)
+        self.assertIn('allocated to', self.amity.add_staff('Robert', 'Opiyo'))
+
+    def test_add_fellow(self):
+        self.amity.add_fellow('Mercy', 'Wachira', 'Y')
+        self.amity.add_fellow('Mercy', 'Muchiri')
+        self.amity.add_fellow('Mercy', 'Nyambura', 'y')
+        self.amity.add_fellow('Mercy', 'Mutiga')
+        self.assertEqual(len(Amity.persons), self.initial_persons_count + 4)
+        self.assertEqual(len(Amity.fellows), self.initial_fellow_count + 4)
 
     def test_load_people(self):
         self.amity.load_people('people.txt')
-        self.assertEqual(len(Amity.persons), 7)
-        self.assertEqual(len(Amity.fellows), 4)
-        self.assertEqual(len(Amity.staff), 3)
+        self.assertEqual(len(Amity.persons), self.initial_persons_count + 7)
+        self.assertEqual(len(Amity.fellows), self.initial_persons_count + 4)
+        self.assertEqual(len(Amity.staff), self.initial_persons_count + 3)
 
     def test_reallocate_person(self):
         pass

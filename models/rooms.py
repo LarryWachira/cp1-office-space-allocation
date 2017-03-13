@@ -17,10 +17,9 @@ class Office(Room):
     max_capacity = 6
 
     def __init__(self, name):
-        super().__init__(name)
+        super(Office, self).__init__(name)
         self.current_occupancy = 0
         self.free_spaces = self.max_capacity - self.current_occupancy
-        self.allocated
 
 
 class LivingSpace(Room):
@@ -28,6 +27,6 @@ class LivingSpace(Room):
     max_capacity = 4
 
     def __init__(self, name):
-        super().__init__(name)
+        super(LivingSpace, self).__init__(name)
         self.current_occupancy = 0
         self.free_spaces = self.max_capacity - self.current_occupancy
