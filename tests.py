@@ -1,5 +1,6 @@
 import unittest
 from models.amity import Amity
+import os
 
 
 class TestAmity(unittest.TestCase):
@@ -16,6 +17,15 @@ class TestAmity(unittest.TestCase):
         self.initial_persons_count = len(Amity.persons)
         self.initial_staff_count = len(Amity.staff)
         self.initial_fellow_count = len(Amity.fellows)
+        with open('sample.txt', "w+") as people:
+            sample_list = ["OLUWAFEMI SULE FELLOW Y\n",
+                           "DOMINIC WALTERS STAFF\n",
+                           "SIMON PATTERSON FELLOW Y\n",
+                           "MARI LAWRENCE FELLOW Y\n",
+                           "LEIGH RILEY STAFF\n", "TANA LOPEZ FELLOW Y\n",
+                           "KELLY McGUIRE STAFF"]
+            for person in sample_list:
+                people.write(person)
 
     def test_create_room(self):
         self.amity.create_room('php', 'office')
@@ -26,7 +36,7 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(len(Amity.offices), self.initial_office_count + 2)
         self.assertEqual(len(Amity.living_spaces),
                          self.initial_living_space_count + 2)
-        self.assertIn('go', [room.name for room in Amity.offices])
+        self.assertIn('GO', [room.name for room in Amity.offices])
 
     def test_add_staff(self):
         self.amity.add_staff('Lawrence', 'Wachira')
@@ -35,7 +45,8 @@ class TestAmity(unittest.TestCase):
         self.amity.add_staff('Lawrence', 'Mutiga')
         self.assertEqual(len(Amity.persons), self.initial_persons_count + 4)
         self.assertEqual(len(Amity.staff), self.initial_staff_count + 4)
-        self.assertIn('allocated to', self.amity.add_staff('Robert', 'Opiyo'))
+        self.assertIn('allocated to the office', self.amity.add_staff(
+            'Robert', 'Opiyo'))
 
     def test_add_fellow(self):
         self.amity.add_fellow('Mercy', 'Wachira', 'Y')
@@ -46,10 +57,13 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(len(Amity.fellows), self.initial_fellow_count + 4)
 
     def test_load_people(self):
-        self.amity.load_people('people.txt')
+        message = "People added from file successfully"
+        self.assertEqual(message, self.amity.load_people('sample.txt'))
         self.assertEqual(len(Amity.persons), self.initial_persons_count + 7)
         self.assertEqual(len(Amity.fellows), self.initial_persons_count + 4)
         self.assertEqual(len(Amity.staff), self.initial_persons_count + 3)
+        self.assertRaises(FileNotFoundError, self.amity.load_people,
+                          'people.txt')
 
     def test_reallocate_person(self):
         pass
@@ -72,6 +86,9 @@ class TestAmity(unittest.TestCase):
 
     def test_load_state(self):
         pass
+
+    def tearDown(self):
+        os.remove('sample.txt')
 
 
 if __name__ == '__main__':
