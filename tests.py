@@ -76,7 +76,11 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(self.amity.print_allocations('test.txt'), message)
 
     def test_print_unallocated(self):
-        pass
+        message = 'Unallocated printed successfully'
+        self.assertEqual(self.amity.print_unallocated(), message)
+        message = 'Unallocated printed and saved to file successfully'
+        self.assertEqual(self.amity.print_unallocated('test'), message)
+        self.assertEqual(self.amity.print_unallocated('test.txt'), message)
 
     def test_print_room(self):
         pass
