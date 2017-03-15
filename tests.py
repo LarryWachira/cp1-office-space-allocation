@@ -45,7 +45,7 @@ class TestAmity(unittest.TestCase):
         self.amity.add_staff('Lawrence', 'Mutiga')
         self.assertEqual(len(Amity.persons), self.initial_persons_count + 4)
         self.assertEqual(len(Amity.staff), self.initial_staff_count + 4)
-        self.assertIn('allocated to the office', self.amity.add_staff(
+        self.assertIn('has been allocated the office', self.amity.add_staff(
             'Robert', 'Opiyo'))
 
     def test_add_fellow(self):
@@ -60,8 +60,8 @@ class TestAmity(unittest.TestCase):
         message = "People added from file successfully"
         self.assertEqual(message, self.amity.load_people('sample.txt'))
         self.assertEqual(len(Amity.persons), self.initial_persons_count + 7)
-        self.assertEqual(len(Amity.fellows), self.initial_persons_count + 4)
-        self.assertEqual(len(Amity.staff), self.initial_persons_count + 3)
+        self.assertEqual(len(Amity.fellows), self.initial_fellow_count + 4)
+        self.assertEqual(len(Amity.staff), self.initial_staff_count + 3)
         self.assertRaises(FileNotFoundError, self.amity.load_people,
                           'people.txt')
 
@@ -69,11 +69,11 @@ class TestAmity(unittest.TestCase):
         pass
 
     def test_print_allocations(self):
-        # allocated_persons = [room.persons_allocated for room in Amity.rooms]
-        # allocated_persons_set = set(allocated_persons)
-        # persons_set = set(Amity.persons)
-        # unallocated_persons = persons_set - allocated_persons_set
-        pass
+        message = 'Allocations printed successfully'
+        self.assertEqual(self.amity.print_allocations(), message)
+        message = 'Allocations printed and saved to file successfully'
+        self.assertEqual(self.amity.print_allocations('test'), message)
+        self.assertEqual(self.amity.print_allocations('test.txt'), message)
 
     def test_print_unallocated(self):
         pass
