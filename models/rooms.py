@@ -11,6 +11,10 @@ class Room(object):
     def __repr__(self):
         return self.name
 
+    def free_spaces(self):
+        free_spaces = self.max_capacity - self.current_occupancy
+        return free_spaces
+
 
 class Office(Room):
     room_type = 'Office'
@@ -19,7 +23,6 @@ class Office(Room):
     def __init__(self, name):
         super(Office, self).__init__(name)
         self.current_occupancy = 0
-        self.free_spaces = self.max_capacity - self.current_occupancy
 
 
 class LivingSpace(Room):
@@ -29,4 +32,3 @@ class LivingSpace(Room):
     def __init__(self, name):
         super(LivingSpace, self).__init__(name)
         self.current_occupancy = 0
-        self.free_spaces = self.max_capacity - self.current_occupancy

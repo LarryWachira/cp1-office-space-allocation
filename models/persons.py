@@ -15,7 +15,11 @@ class Person(object):
 
 class Staff(Person):
     designation = "Staff"
-    office_allocated = None
+
+    def __init__(self, first_name, second_name):
+        super(Staff, self).__init__(first_name, second_name)
+        self.office_allocated = None
+        self.employee_id = 0
 
 
 class Fellow(Person):
@@ -26,7 +30,7 @@ class Fellow(Person):
         self.wants_accommodation = wants_accommodation
         self.office_allocated = None
         self.living_space_allocated = None
-        self.id = id(self)
+        self.employee_id = 0
 
     # @staticmethod
     # def printe():
