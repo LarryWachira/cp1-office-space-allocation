@@ -19,9 +19,11 @@ Options:
 
 import cmd
 import sys
+
 from docopt import docopt, DocoptExit
-from models.amity import Amity
 from pyfiglet import Figlet
+
+from models.amity import Amity
 
 
 def docopt_cmd(func):
@@ -98,6 +100,11 @@ class AmityApp(cmd.Cmd):
         new_room_name = args['<new_room_name>']
 
         self.amity.reallocate_person(employee_id, new_room_name)
+
+    @docopt_cmd
+    def do_load_people(self, args):
+        """Usage: load_people [--filename=people]"""
+        self.amity.load_people()
 
     @docopt_cmd
     def do_print_allocations(self, args):
