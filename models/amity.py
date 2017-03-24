@@ -1,6 +1,8 @@
+from random import choice
+from time import sleep
+
 from models.persons import Staff, Fellow
 from models.rooms import Office, LivingSpace
-from random import choice
 
 
 class Amity(object):
@@ -13,7 +15,11 @@ class Amity(object):
 
     def create_room(self, name, room_type):
         if name.isalpha():
-            if room_type.upper() in ["OFFICE", "O"]:
+            if name.upper() in [room.name for room in self.rooms]:
+                print("\nRoom {} already exists".format(name.upper()))
+                return "Duplicate entry"
+
+            elif room_type.upper() in ["OFFICE", "O"]:
                 office_object = Office(name.upper())
                 self.rooms.append(office_object)
                 self.offices.append(office_object)
@@ -35,7 +41,9 @@ class Amity(object):
                   "alphabetical characters".format(name))
 
     def add_staff(self, first_name, second_name):
-        Amity.check_duplicate_name(first_name, second_name)
+        check_result = Amity.check_duplicate_name(first_name, second_name)
+        if check_result in ["Duplicate entry", "Invalid"]:
+            return check_result
 
         staff_object = Staff(first_name.upper(), second_name.upper())
         staff_object.employee_id = Amity.generate_id()
@@ -51,16 +59,18 @@ class Amity(object):
             selected_office.current_occupancy += 1
             message = "Staff {} has been allocated the office {}".format(
                       staff_object, selected_office)
-            print('\t', message, "\n")
+            print('\t\n', message)
             return message
 
         else:
             message = "No empty offices available. Staff {} has not been " \
                       "allocated".format(staff_object)
-            print("\t", message, "\n")
+            print("\t\n", message)
 
     def add_fellow(self, first_name, second_name, wants_accommodation='N'):
-        Amity.check_duplicate_name(first_name, second_name)
+        check_result = Amity.check_duplicate_name(first_name, second_name)
+        if check_result in ["Duplicate entry", "Invalid"]:
+            return check_result
 
         fellow_object = Fellow(first_name.upper(), second_name.upper(),
                                wants_accommodation.upper())
@@ -77,12 +87,12 @@ class Amity(object):
             selected_office.current_occupancy += 1
             message = "Fellow {} has been allocated the office {}".format(
                 fellow_object, selected_office)
-            print('\t', message, "\n")
+            print('\t\n', message)
 
         else:
             message = "No empty offices available. Fellow {} has not been " \
                       "allocated".format(fellow_object)
-            print("\t", message, "\n")
+            print("\t\n", message)
 
         if wants_accommodation == "Y":
             empty_living_spaces = [room for room in self.living_spaces if
@@ -95,17 +105,20 @@ class Amity(object):
                 selected_living_space.current_occupancy += 1
                 message = "Fellow {} has been allocated the living space " \
                           "{}".format(fellow_object, selected_living_space)
-                print('\t', message, "\n")
+                print('\t\n', message)
                 return message
 
             else:
                 message = "No empty living spaces available. Fellow {} has " \
                           "not been allocated".format(fellow_object)
-                print("\t", message, "\n")
+                print("\t\n", message)
                 return message
 
     def reallocate_person(self, employee_id, new_room_name):
-        Amity.verify_id_and_new_room_values(employee_id, new_room_name)
+        verify_result = Amity.verify_id_and_new_room_values(employee_id,
+                                                     new_room_name)
+        if verify_result in ["Invalid ID", "Invalid new room name"]:
+            return verify_result
 
         if employee_id not in [person.employee_id for person in self.persons]:
             message = "Employee ID does not exist"
@@ -168,6 +181,9 @@ class Amity(object):
             return "Fellow reallocated"
 
     def load_people(self, file_name):
+        if ".txt" not in file_name:
+            file_name += '.txt'
+
         try:
             with open(file_name) as people:
                 content = people.readlines()
@@ -177,26 +193,31 @@ class Amity(object):
 
                     if person_details[2].upper() == 'STAFF':
                         self.add_staff(person_details[0], person_details[1])
+                        sleep(0.5)
 
                     elif person_details[2].upper() == 'FELLOW':
                         try:
                             self.add_fellow(person_details[0],
                                             person_details[1],
                                             person_details[3])
+                            sleep(0.5)
 
                         except IndexError:
                             self.add_fellow(person_details[0],
                                             person_details[1])
+                            sleep(0.5)
 
                 message = "People added from file successfully"
                 print('\n\n\t\t', message, "\n")
                 return message
 
-        except FileNotFoundError as f:
-            print("\n\n\t\t File does not exist. Try a different file name.\n")
-            raise f
+        except FileNotFoundError:
+            print("\n  File '{}' does not exist. Try a different file "
+                  "name. Also ensure it's a text file".format(file_name))
 
-    def print_allocations(self, to_file=False):
+            return "Non-existent file"
+
+    def print_allocations(self, file_name=None):
         if len(self.persons) == 0:
             message = "No Employees have been added"
             print("\n", message)
@@ -211,6 +232,8 @@ class Amity(object):
                 if len(occupants) > 0:
                     print("\n", office, ": [OFFICE]")
                     Amity.print_allocations_list_procedure(occupants)
+
+                sleep(0.5)
                 # if to_file:
                 #     Amity.write_to_file()
 
@@ -223,15 +246,17 @@ class Amity(object):
                 if len(occupants) > 0:
                     print("\n", living_space, ": [LIVING SPACE]")
                     Amity.print_allocations_list_procedure(occupants)
+
+                sleep(0.5)
                 # if to_file:
                 #     Amity.write_to_file()
 
-        if to_file:
+        if file_name:
             return 'Allocations printed and saved to file successfully'
         else:
             return 'Finished'
 
-    def print_unallocated(self, to_file=False):
+    def print_unallocated(self, file_name=None):
         unallocated_offices = [person for person in self.persons if
                                person.office_allocated is None]
 
@@ -240,8 +265,10 @@ class Amity(object):
             Amity.print_allocations_list_procedure(unallocated_offices)
         elif len(self.persons) == 0:
             print("\nNo employees have been added")
+            return "No employees"
         else:
             print("\nAll employees have been allocated offices")
+            return "All allocated"
 
         # if to_file:
         #     Amity.write_to_file()
@@ -263,7 +290,7 @@ class Amity(object):
         # if to_file:
         #     Amity.write_to_file()
 
-        if to_file:
+        if file_name:
             return 'Unallocated printed and saved to file successfully'
         else:
             return 'Finished'
@@ -286,7 +313,6 @@ class Amity(object):
 
         return "Room printed successfully"
 
-
     def save_state(self):
         pass
 
@@ -299,7 +325,7 @@ class Amity(object):
             unique_id.seek(0)
             person_id = unique_id.read()
 
-            if person_id == '':
+            if not person_id:
                 person_id = 1
             else:
                 person_id = int(person_id)
@@ -315,10 +341,11 @@ class Amity(object):
         print("----------------------------------------------------------\n")
         if len(people_list) > 1:
             for person in people_list[:-1]:
-                print("[", person.employee_id, "]", person, end=",  ")
+                print("[", person.employee_id, "]", person, end=', ')
+
             print("[", people_list[-1].employee_id, "]", people_list[-1])
             print("\n")
-        else:
+        elif len(people_list) == 1:
             print("[", people_list[0].employee_id, "]", people_list[0])
             print("\n")
 
@@ -341,7 +368,6 @@ class Amity(object):
     #                     file.write(person,"\n")
     #     else:
 
-
     @staticmethod
     def verify_id_and_new_room_values(employee_id, new_room_name):
         if type(employee_id) != int:
@@ -353,6 +379,9 @@ class Amity(object):
                   "alphabetical characters")
             return "Invalid new room name"
 
+        else:
+            return
+
     @staticmethod
     def check_duplicate_name(first_name, second_name):
         if first_name.isalpha() and second_name.isalpha():
@@ -362,9 +391,12 @@ class Amity(object):
                     print("\nThe person {} {} already exists.".format(
                         first_name, second_name))
                     return "Duplicate entry"
+            return
+
         else:
             print("\nInvalid person name. Both the first name and second name "
                   "should consist of alphabetical characters.")
+            return "Invalid"
 
 
 
