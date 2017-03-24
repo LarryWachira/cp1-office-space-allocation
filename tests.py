@@ -51,7 +51,7 @@ class TestAmity(unittest.TestCase):
         self.amity.create_room('php', 'office')
         self.amity.create_room('go', 'o')
         self.amity.create_room('scala', 'l')
-        self.amity.create_room('php', 'living space')
+        self.amity.create_room('php', 'livingspace')
         self.assertEqual(len(Amity.rooms), self.initial_room_count + 4)
         self.assertEqual(len(Amity.offices), self.initial_office_count + 2)
         self.assertEqual(len(Amity.living_spaces),
@@ -82,8 +82,8 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(len(Amity.persons), self.initial_persons_count + 7)
         self.assertEqual(len(Amity.fellows), self.initial_fellow_count + 4)
         self.assertEqual(len(Amity.staff), self.initial_staff_count + 3)
-        self.assertRaises(FileNotFoundError, self.amity.load_people,
-                          'people.txt')
+        self.assertEqual('Non-existent file', self.amity.load_people(
+            'people.txt'))
 
     def test_reallocate_person(self):
         message = "Employee ID does not exist"
@@ -94,12 +94,12 @@ class TestAmity(unittest.TestCase):
     def test_print_allocations(self):
         self.assertEqual(self.amity.print_allocations(), 'Finished')
         message = 'Allocations printed and saved to file successfully'
-        self.assertEqual(self.amity.print_allocations(True), message)
+        self.assertEqual(self.amity.print_allocations('allocated'), message)
 
     def test_print_unallocated(self):
         self.assertEqual(self.amity.print_unallocated(), "Finished")
         message = 'Unallocated printed and saved to file successfully'
-        self.assertEqual(self.amity.print_unallocated(True), message)
+        self.assertEqual(self.amity.print_unallocated('unallocated'), message)
 
     def test_print_room(self):
         self.assertEqual(self.amity.print_room("go"), "Didn't print")
