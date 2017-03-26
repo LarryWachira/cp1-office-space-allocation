@@ -9,25 +9,31 @@ class TestAmity(unittest.TestCase):
 
     def setUp(self):
         self.amity = Amity()
-        office_1 = Office('PERL')
-        office_2 = Office('OCCULUS')
-        living_space_1 = LivingSpace('DOJO')
-        living_space_2 = LivingSpace('NODE')
-        staff_1 = Staff("BOB", "WACHIRA")
-        staff_2 = Staff("BOB", "ODHIAMBO")
-        fellow_1 = Fellow("LAWRENCE", "WACHIRA", "N")
-        fellow_2 = Fellow("LAWRENCE", "NYAMBURA", "Y")
-        staff_1.employee_id, staff_1.office_allocated = 1, "PERL"
-        staff_2.employee_id = 2
-        fellow_1.employee_id = 3
-        fellow_2.employee_id, fellow_2.office_allocated = 4, "OCCULUS"
-        fellow_2.living_space_allocated = "DOJO"
-        Amity.rooms = [office_1, office_2, living_space_1, living_space_2]
-        Amity.offices = [office_1, office_2]
-        Amity.living_spaces = [living_space_2, living_space_1]
-        Amity.persons = [staff_1, staff_2, fellow_1, fellow_2]
-        Amity.staff = [staff_2, staff_1]
-        Amity.fellows = [fellow_2, fellow_1]
+        self.office_1 = Office('PERL')
+        self.office_2 = Office('OCCULUS')
+        self.living_space_1 = LivingSpace('DOJO')
+        self.living_space_2 = LivingSpace('NODE')
+        self.staff_1 = Staff("BOB", "WACHIRA")
+        self.staff_2 = Staff("BOB", "ODHIAMBO")
+        self.fellow_1 = Fellow("LAWRENCE", "WACHIRA", "N")
+        self.fellow_2 = Fellow("LAWRENCE", "NYAMBURA", "Y")
+        self.staff_1.employee_id, self.staff_1.office_allocated = 1, "PERL"
+        self.office_1.current_occupancy = 1
+        self.staff_2.employee_id = 2
+        self.fellow_1.employee_id = 3
+        self.fellow_2.employee_id, self.fellow_2.office_allocated = 4, \
+                                                                    "OCCULUS"
+        self.office_2.current_occupancy = 1
+        self.fellow_2.living_space_allocated = "DOJO"
+        self.living_space_1.current_occupancy = 1
+        Amity.rooms = [self.office_1, self.office_2, self.living_space_1,
+                       self.living_space_2]
+        Amity.offices = [self.office_1, self.office_2]
+        Amity.living_spaces = [self.living_space_2, self.living_space_1]
+        Amity.persons = [self.staff_1, self.staff_2, self.fellow_1,
+                         self.fellow_2]
+        Amity.staff = [self.staff_2, self.staff_1]
+        Amity.fellows = [self.fellow_2, self.fellow_1]
         self.initial_room_count = len(Amity.rooms)
         self.initial_office_count = len(Amity.offices)
         self.initial_living_space_count = len(Amity.living_spaces)
@@ -51,7 +57,7 @@ class TestAmity(unittest.TestCase):
         self.amity.create_room('php', 'office')
         self.amity.create_room('go', 'o')
         self.amity.create_room('scala', 'l')
-        self.amity.create_room('php', 'livingspace')
+        self.amity.create_room('shell', 'livingspace')
         self.assertEqual(len(Amity.rooms), self.initial_room_count + 4)
         self.assertEqual(len(Amity.offices), self.initial_office_count + 2)
         self.assertEqual(len(Amity.living_spaces),
@@ -59,9 +65,9 @@ class TestAmity(unittest.TestCase):
         self.assertIn('GO', [room.name for room in Amity.offices])
 
     def test_add_staff(self):
-        self.amity.add_staff('Lawrence', 'Wachira')
+        self.amity.add_staff('Lawrence', 'Otieno')
         self.amity.add_staff('Lawrence', 'Muchiri')
-        self.amity.add_staff('Lawrence', 'Nyambura')
+        self.amity.add_staff('Lawrence', 'Kilonzo')
         self.amity.add_staff('Lawrence', 'Mutiga')
         self.assertEqual(len(Amity.persons), self.initial_persons_count + 4)
         self.assertEqual(len(Amity.staff), self.initial_staff_count + 4)
@@ -84,6 +90,7 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(len(Amity.staff), self.initial_staff_count + 3)
         self.assertEqual('Non-existent file', self.amity.load_people(
             'people.txt'))
+        self.assertEqual("Invalid file", self.amity.load_people('people.mp3'))
 
     def test_reallocate_person(self):
         message = "Employee ID does not exist"
@@ -98,10 +105,19 @@ class TestAmity(unittest.TestCase):
 
     def test_print_unallocated(self):
         self.assertEqual(self.amity.print_unallocated(), "Finished")
-        message = 'Unallocated printed and saved to file successfully'
-        self.assertEqual(self.amity.print_unallocated('unallocated'), message)
+        message = 'Write to file complete'
+        self.assertEqual(self.amity.print_unallocated('unallocated.txt'),
+                         message)
+        self.staff_2.office_allocated = "OCCULUS"
+        self.fellow_1.office_allocated = "OCCULUS"
+        self.office_2.current_occupancy = 3
+        self.assertEqual(self.amity.print_unallocated('unallocated.txt'),
+                         'Did not output to file. All allocated')
+        self.assertEqual(self.amity.print_unallocated(), 'All allocated')
+        os.remove("unallocated.txt")
 
     def test_print_room(self):
+
         self.assertEqual(self.amity.print_room("go"), "Didn't print")
         self.assertEqual(self.amity.print_room("perl"), "Room printed "
                                                         "successfully")
