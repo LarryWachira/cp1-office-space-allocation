@@ -94,7 +94,7 @@ class Amity(object):
                       "allocated".format(fellow_object)
             print("\t\n", message)
 
-        if wants_accommodation == "Y":
+        if wants_accommodation.upper() == "Y":
             empty_living_spaces = [room for room in self.living_spaces if
                                    room.free_spaces() > 0]
 
@@ -116,7 +116,7 @@ class Amity(object):
 
     def reallocate_person(self, employee_id, new_room_name):
         verify_result = Amity.verify_id_and_new_room_values(employee_id,
-                                                     new_room_name)
+                                                            new_room_name)
         if verify_result in ["Invalid ID", "Invalid new room name"]:
             return verify_result
 
@@ -181,8 +181,10 @@ class Amity(object):
             return "Fellow reallocated"
 
     def load_people(self, file_name):
-        if ".txt" not in file_name:
-            file_name += '.txt'
+        if not file_name.endswith('.txt'):
+            print("Invalid file format. Amity accepts only text files with "
+                  "the '.txt' extension")
+            return "Invalid file"
 
         try:
             with open(file_name) as people:
@@ -242,7 +244,8 @@ class Amity(object):
         else:
             for living_space in self.living_spaces:
                 occupants = [fellow for fellow in self.fellows if
-                             fellow.living_space_allocated == living_space.name]
+                             fellow.living_space_allocated ==
+                             living_space.name]
                 if len(occupants) > 0:
                     print("\n", living_space, ": [LIVING SPACE]")
                     Amity.print_allocations_list_procedure(occupants)
@@ -268,10 +271,6 @@ class Amity(object):
             return "No employees"
         else:
             print("\nAll employees have been allocated offices")
-            return "All allocated"
-
-        # if to_file:
-        #     Amity.write_to_file()
 
         unallocated_living_spaces = [fellow for fellow in self.fellows if
                                      fellow.living_space_allocated is None
@@ -287,28 +286,72 @@ class Amity(object):
             print("\nAll Fellows that want accommodation have been allocated "
                   "Living Spaces")
 
-        # if to_file:
-        #     Amity.write_to_file()
+        unallocated_persons = unallocated_offices + unallocated_living_spaces
 
         if file_name:
-            return 'Unallocated printed and saved to file successfully'
+            if not file_name.endswith('.txt'):
+                print("Invalid file name. Amity write only to text files. "
+                      "Choose a different name that ends with the '.txt' "
+                      "extension")
+                return "Invalid filename"
+
+            elif len(unallocated_persons) == 0:
+                print("\nDid not output to file. All employees have been "
+                      "allocated rooms.")
+                return "Did not output to file. All allocated"
+
+            else:
+                with open(file_name, 'w+') as file:
+                    for person in unallocated_persons:
+                        if person.designation == "FELLOW":
+                            file.write("[" + str(person.employee_id) + "]"
+                                       + ' ' + person.first_name + ' '
+                                       + person.second_name + ' '
+                                       + person.designation + ' '
+                                       + person.wants_accommodation + ' \n')
+
+                        if person.designation == "STAFF":
+                            file.write("[" + str(person.employee_id) + "]"
+                                       + ' ' + person.first_name + ' '
+                                       + person.second_name + '  '
+                                       + person.designation + ' \n')
+
+                return 'Write to file complete'
+
+        elif len(unallocated_persons) == 0:
+            return "All allocated"
+
         else:
             return 'Finished'
 
     def print_room(self, room_name):
+        for room in self.rooms:
+            if room.name == room_name.upper():
+                room_object = room
+
         if room_name.upper() not in [room.name for room in self.rooms]:
             print('\nThe room {} has not been created'.format(
                 room_name.upper()))
             return "Didn't print"
 
         elif room_name.upper() in [office.name for office in self.offices]:
+            if room_object.free_spaces() == 6:
+                print("\nNo one has been allocated {}".format(
+                    room_object.name))
+                return "None allocated"
             people_list = [person for person in self.persons if
                            person.office_allocated == room_name.upper()]
+            print('\n\n', room_name.upper(), ': OFFICE')
             Amity.print_allocations_list_procedure(people_list)
 
         else:
+            if room_object.free_spaces() == 4:
+                print("\nNo one has been allocated {}".format(
+                    room_object.name))
+                return "None allocated"
             people_list = [fellow for fellow in self.fellows if
                            fellow.living_space_allocated == room_name.upper()]
+            print('\n\n', room_name.upper(), ': LIVING SPACE')
             Amity.print_allocations_list_procedure(people_list)
 
         return "Room printed successfully"
@@ -341,32 +384,13 @@ class Amity(object):
         print("----------------------------------------------------------\n")
         if len(people_list) > 1:
             for person in people_list[:-1]:
-                print("[", person.employee_id, "]", person, end=', ')
+                print("[", person.employee_id, "]", person, end=',  ')
 
             print("[", people_list[-1].employee_id, "]", people_list[-1])
             print("\n")
         elif len(people_list) == 1:
             print("[", people_list[0].employee_id, "]", people_list[0])
             print("\n")
-
-    # @staticmethod
-    # def write_to_file(filename, list):
-    #     if filename == 'allocations.txt':
-    #         with open(filename, "a+") as file:
-    #             for office in self.offices:
-    #                 occupants = [person for person in self.persons if
-    #                              person.office_allocated == office.name]
-    #                 if len(occupants) > 0:
-    #                     print("\n", office, ": [OFFICE]")
-    #                     Amity.print_allocations_list_procedure(occupants)
-    #                 if to_file:
-    #                     Amity.write_to_file()
-    #
-    #         with open(filename, "a+") as file:
-    #             if len(list) > 0:
-    #                 for person in list:
-    #                     file.write(person,"\n")
-    #     else:
 
     @staticmethod
     def verify_id_and_new_room_values(employee_id, new_room_name):
@@ -397,43 +421,3 @@ class Amity(object):
             print("\nInvalid person name. Both the first name and second name "
                   "should consist of alphabetical characters.")
             return "Invalid"
-
-
-
-
-# Amity().create_room('Krypton', 'o')
-# Amity().create_room('Kal-el', 'o')
-# Amity().create_room('Kal', 'o')
-# Amity().create_room('Oculus', 'l')
-# Amity().create_room('Battlefield', 'l')
-# Amity().add_staff('awrence', 'achira')
-# Amity().add_staff('Lawe', 'Waira')
-# Amity().add_fellow('Lawrence', 'Wachira', 'Y')
-# Amity().add_staff('Lawrence', 'Wachir')
-# Amity().add_staff('Lawrence', 'Wachia')
-# Amity().add_staff('Lawrence', 'Wachra')
-# Amity().add_staff('Lawrence', 'Wacira')
-# Amity().add_staff('Lawrence', 'Wahira')
-# Amity().add_staff('Lawrence', 'Wchira')
-# Amity().add_staff('Lawrence', 'achira')
-# Amity().add_staff('Lawrenc', 'Wachira')
-# Amity().add_staff('Lawrene', 'Wachira')
-# Amity().add_staff('Lawrece', 'Wachira')
-# Amity().add_staff('Lawrnce', 'Wachira')
-# Amity().add_staff('Lawence', 'Wachira')
-# Amity().add_staff('Larence', 'Muchiri')
-# Amity().add_staff('Lwrence', 'Nyambura')
-# Amity().add_staff('awrence', 'Mutiga')
-# val = Rooms('Valhalla', 'Office')
-# print(val.room_type)
-# print(Room.rooms)
-# Amity().create_room()
-# print(len(Amity.rooms))
-# Amity().load_people('sampl.txt')
-# Amity().print_allocations()
-# Amity().print_unallocated()
-# Amity().reallocate_person(457, "Kal")
-# office = (lambda room: room in Amity.rooms if room.name == "KRYPTON")
-# print(office)
-# print(office.free_spaces)
-# print(office.current_occupancy)
