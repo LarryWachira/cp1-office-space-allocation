@@ -14,7 +14,7 @@ class Person(object):
 
 
 class Staff(Person):
-    designation = "Staff"
+    designation = "STAFF"
 
     def __init__(self, first_name, second_name):
         super(Staff, self).__init__(first_name, second_name)
@@ -23,7 +23,7 @@ class Staff(Person):
 
 
 class Fellow(Person):
-    designation = "Fellow"
+    designation = "FELLOW"
 
     def __init__(self, first_name, second_name, wants_accommodation):
         super(Fellow, self).__init__(first_name, second_name)
@@ -31,25 +31,3 @@ class Fellow(Person):
         self.office_allocated = None
         self.living_space_allocated = None
         self.employee_id = 0
-
-    # @staticmethod
-    # def printe():
-    #     print("Yo!")
-
-
-# mwas = Fellow('Dennis', 'Mwangi', 'N')
-# print(mwas.designation)
-# print(mwas.wants_accommodation)
-# print(mwas.first_name)
-# print(mwas)
-# print(mwas.id)
-# # mwas.printe()
-# Fellow.printe()
-
-# shem = Staff("Shem", "Ogumbe")
-# print(shem.first_name)
-# print(shem.second_name)
-# print(shem.designation)
-
-# print(shem.__dict__)
-# print(mwas.__dict__)
