@@ -17,7 +17,7 @@ class Room(object):
 
 
 class Office(Room):
-    room_type = 'Office'
+    room_type = 'OFFICE'
     max_capacity = 6
 
     def __init__(self, name):
@@ -26,7 +26,7 @@ class Office(Room):
 
 
 class LivingSpace(Room):
-    room_type = 'Living Space'
+    room_type = 'LIVING SPACE'
     max_capacity = 4
 
     def __init__(self, name):
