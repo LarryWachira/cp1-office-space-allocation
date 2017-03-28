@@ -63,7 +63,7 @@ def docopt_cmd(func):
 class AmityApp(cmd.Cmd):
     intro = '\n\t\t\t\tWelcome to Amity!\n\t    -Type help for a list of ' \
             'instructions on how to use the app-'
-    prompt = '\nAmity >> '
+    prompt = '\n\nAmity >> '
     amity = Amity()
 
     @docopt_cmd
@@ -74,7 +74,7 @@ class AmityApp(cmd.Cmd):
 
         for name in room_list:
             self.amity.create_room(name, room_type)
-            sleep(0.5)
+            sleep(0.2)
 
     @docopt_cmd
     def do_add(self, args):
@@ -88,11 +88,10 @@ Options:
         designation = args['<designation>']
         first_name = args['<first_name>']
         second_name = args['<second_name>']
-        print(args['-a'])
         wants_accommodation = args['-a']
 
         if wants_accommodation.upper() not in ["Y", "N"]:
-            print("<wants_accommodation> should either be 'Y' or 'N' and is "
+            print("\n<wants_accommodation> should either be 'Y' or 'N' and is "
                   "not an option for STAFF persons")
 
         elif designation.upper() in ["FELLOW", "F"]:
@@ -103,13 +102,13 @@ Options:
 
         elif designation.upper() in ["STAFF", "S"]:
             if wants_accommodation != 'N':
-                print("\nSTAFF persons cannot be allocated living spaces")
+                print("\n  STAFF persons cannot be allocated living spaces")
 
             else:
                 self.amity.add_staff(first_name, second_name)
 
         else:
-            print("\nInvalid Employee designation. Designation should be "
+            print("\n  Invalid Employee designation. Designation should be "
                   "either 'Staff' or 'Fellow'")
 
     @docopt_cmd
@@ -135,8 +134,11 @@ Options:
 Options:
     -f <file_name>  Output to file
         """
+        if arg['-f']:
+            self.amity.print_allocations(arg['-f'])
 
-        self.amity.print_allocations()
+        else:
+            self.amity.print_allocations()
 
     @docopt_cmd
     def do_print_unallocated(self, arg):
@@ -146,8 +148,11 @@ Options:
 Options:
     -f <unallocated.txt>  Output to file
         """
+        if arg['-f']:
+            self.amity.print_unallocated(arg['-f'])
 
-        self.amity.print_unallocated()
+        else:
+            self.amity.print_unallocated()
 
     @docopt_cmd
     def do_print(self, arg):
@@ -159,7 +164,7 @@ Options:
             self.amity.print_room(room_name)
 
         else:
-            print("\nInvalid room name. Room name should consist of "
+            print("\n  Invalid room name. Room name should consist of "
                   "alphabetical characters only")
 
     @docopt_cmd
@@ -198,10 +203,10 @@ Options:
     @docopt_cmd
     def do_exit(self, arg):
         """Usage: exit"""
-        print('\n' + '*' * 50 + '\n')
-        print('\tThank you for using Amity!\n')
-        print('*' * 50)
-        style = Figlet(font='slant')
+        print('\n\n' + '*' * 60 + '\n')
+        print('\t\tThank you for using Amity!\n')
+        print('*' * 60)
+        style = Figlet(font='pebbles')
         print(style.renderText('Good Bye!'))
         exit()
 
@@ -211,9 +216,9 @@ opt = docopt(__doc__, sys.argv[1:] + ['-i'], version=1.0)
 if opt['--interactive']:
     try:
         print('\n')
-        style = Figlet(font='block')
+        style = Figlet(font='dotmatrix')
         print(style.renderText('Amity'))
-        print('*' * 50)
+        print('*' * 65)
         print(__doc__)
         AmityApp().cmdloop()
     except KeyboardInterrupt:
