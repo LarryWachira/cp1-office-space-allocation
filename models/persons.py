@@ -1,7 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class Person(metaclass=ABCMeta):
+class Person(ABC):
 
     @abstractmethod
     def __init__(self, first_name, second_name):

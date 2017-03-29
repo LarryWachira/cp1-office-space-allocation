@@ -1,7 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class Room(metaclass=ABCMeta):
+class Room(ABC):
 
     @abstractmethod
     def __init__(self, name):
