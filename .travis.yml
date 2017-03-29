@@ -1,12 +1,18 @@
 language: python
+
 python:
 - '3.6'
+
 install:
 - pip install -r requirements.txt
 - pip install coveralls
+
 branches:
   only:
     - master
+
 script: nosetests --with-coverage
+
 after_success: coveralls
+
 cache: pip
