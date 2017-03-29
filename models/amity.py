@@ -1,9 +1,13 @@
-from os import path, mkdir
+from os import path, mkdir, remove
 from random import choice
 from time import sleep
+import sqlite3
+
+from termcolor import colored, cprint
 
 from models.persons import Staff, Fellow
 from models.rooms import Office, LivingSpace
+from models.config import files_directory_path, databases_directory_path
 
 
 class Amity(object):
@@ -13,7 +17,6 @@ class Amity(object):
     persons = []
     staff = []
     fellows = []
-    files_directory_path = './files/'
 
     def create_room(self, name, room_type):
         if name.isalpha():
@@ -23,14 +26,14 @@ class Amity(object):
 
             elif room_type.upper() in ["OFFICE", "O"]:
                 office_object = Office(name.upper())
-                self.rooms.append(office_object)
                 self.offices.append(office_object)
+                self.rooms.append(office_object)
                 print("\n  Office {} has been created".format(name.upper()))
 
             elif room_type.upper() in ["LIVINGSPACE", "L"]:
                 living_space_object = LivingSpace(name.upper())
-                self.rooms.append(living_space_object)
                 self.living_spaces.append(living_space_object)
+                self.rooms.append(living_space_object)
                 print("\n  Living Space {} has been created".format(
                     name.upper())
                       )
@@ -53,11 +56,11 @@ class Amity(object):
         self.staff.append(staff_object)
         self.persons.append(staff_object)
 
-        empty_offices = [room for room in self.offices if
-                         room.free_spaces() > 0]
+        available_offices = [room for room in self.offices if
+                             room.free_spaces()]
 
-        if len(empty_offices) > 0:
-            selected_office = choice(empty_offices)
+        if available_offices:
+            selected_office = choice(available_offices)
             staff_object.office_allocated = selected_office.name
             selected_office.current_occupancy += 1
             message = "Staff {} has been allocated the office {}".format(
@@ -81,11 +84,11 @@ class Amity(object):
         self.fellows.append(fellow_object)
         self.persons.append(fellow_object)
 
-        empty_offices = [room for room in self.offices if
-                         room.free_spaces() > 0]
+        available_offices = [room for room in self.offices if
+                             room.free_spaces()]
 
-        if len(empty_offices) > 0:
-            selected_office = choice(empty_offices)
+        if available_offices:
+            selected_office = choice(available_offices)
             fellow_object.office_allocated = selected_office.name
             selected_office.current_occupancy += 1
             message = "Fellow {} has been allocated the office {}".format(
@@ -98,11 +101,11 @@ class Amity(object):
             print("\n  ", message)
 
         if wants_accommodation.upper() == "Y":
-            empty_living_spaces = [room for room in self.living_spaces if
-                                   room.free_spaces() > 0]
+            available_living_spaces = [room for room in self.living_spaces if
+                                       room.free_spaces()]
 
-            if len(empty_living_spaces) > 0:
-                selected_living_space = choice(empty_living_spaces)
+            if available_living_spaces:
+                selected_living_space = choice(available_living_spaces)
                 fellow_object.living_space_allocated = \
                     selected_living_space.name
                 selected_living_space.current_occupancy += 1
@@ -153,7 +156,7 @@ class Amity(object):
                     new_office = room
                     break
 
-            if new_office.free_spaces() == 0:
+            if not new_office.free_spaces():
                 print("\n  Cannot reallocate {}. New office {} is full "
                       "to capacity".format(person_to_be_reallocated,
                                            new_office.name))
@@ -201,7 +204,7 @@ class Amity(object):
                     new_living_space = room
                     break
 
-            if new_living_space.free_spaces() == 0:
+            if not new_living_space.free_spaces():
                 print("\n  Cannot reallocate {}. New living space {} is "
                       "full to capacity".format(fellow_to_be_reallocated,
                                                 new_living_space.name))
@@ -248,7 +251,7 @@ class Amity(object):
         self.create_files_directory()
 
         try:
-            with open(self.files_directory_path + file_name) as people:
+            with open(files_directory_path + file_name) as people:
                 content = people.readlines()
 
                 for line in content:
@@ -282,36 +285,36 @@ class Amity(object):
             return "Non-existent file"
 
     def print_allocations(self, file_name=None):
-        if len(self.persons) == 0:
+        if not self.persons:
             message = "No Employees have been added"
             print("\n  ", message)
             return message
 
-        if len(self.rooms) == 0:
+        if not self.rooms:
             message = "No rooms have been created"
             print("\n  ", message)
             return message
 
-        if len(self.offices) == 0:
+        if not self.offices:
             print("\n  No offices have been created.")
         else:
             for office in self.offices:
                 office_occupants = [person for person in self.persons if
                                     person.office_allocated == office.name]
-                if len(office_occupants) > 0:
+                if office_occupants:
                     print("\n  ", office, ": [OFFICE]")
                     Amity.print_allocations_list_procedure(office_occupants)
 
                 sleep(0.2)
 
-        if len(self.living_spaces) == 0:
+        if not self.living_spaces:
             print("\n  No Living Spaces have been created.")
         else:
             for living_space in self.living_spaces:
                 living_space_occupants = [fellow for fellow in self.fellows if
                                           fellow.living_space_allocated ==
                                           living_space.name]
-                if len(living_space_occupants) > 0:
+                if living_space_occupants:
                     print("\n  ", living_space, ": [LIVING SPACE]")
                     Amity.print_allocations_list_procedure(
                         living_space_occupants)
@@ -327,14 +330,14 @@ class Amity(object):
 
             self.create_files_directory()
 
-            with open(self.files_directory_path + file_name, 'w+') as file:
+            with open(files_directory_path + file_name, 'w+') as file:
 
-                if len(self.offices) > 0:
+                if self.offices:
                     for office in self.offices:
                         occupants = [person for person in self.persons if
                                      person.office_allocated == office.name]
 
-                        if len(occupants) > 0:
+                        if occupants:
                             file.write(office.name + ": OFFICE\n\n")
                             for person in occupants:
                                 file.write("[" + str(person.employee_id) + "] "
@@ -345,13 +348,13 @@ class Amity(object):
 
                     file.write("\n\n")
 
-                if len(self.living_spaces) > 0:
+                if self.living_spaces:
                     for living_space in self.living_spaces:
                         occupants = [fellow for fellow in self.fellows if
                                      fellow.living_space_allocated ==
                                      living_space.name]
 
-                        if len(occupants) > 0:
+                        if occupants:
                             file.write(living_space.name + ": LIVING "
                                                            "SPACE\n\n")
                             for fellow in occupants:
@@ -373,10 +376,10 @@ class Amity(object):
         unallocated_offices = [person for person in self.persons if
                                person.office_allocated is None]
 
-        if len(unallocated_offices) > 0:
+        if unallocated_offices:
             print('\n  Persons that have not been allocated an office:')
             Amity.print_allocations_list_procedure(unallocated_offices)
-        elif len(self.persons) == 0:
+        elif not self.persons:
             print("\n  No employees have been added")
             return "No employees"
         else:
@@ -386,11 +389,11 @@ class Amity(object):
                                      fellow.living_space_allocated is None
                                      and fellow.wants_accommodation == "Y"]
 
-        if len(unallocated_living_spaces) > 0:
+        if unallocated_living_spaces:
             print("\n  Fellows that want accommodation and have not been "
                   "allocated:")
             Amity.print_allocations_list_procedure(unallocated_living_spaces)
-        elif len(self.fellows) == 0:
+        elif not self.fellows:
             print("\n  No Fellows have been added")
         else:
             print("\n  All Fellows that want accommodation have been "
@@ -399,7 +402,7 @@ class Amity(object):
         unallocated_persons = unallocated_offices + unallocated_living_spaces
 
         if file_name:
-            if len(unallocated_persons) == 0:
+            if not unallocated_persons:
                 print("\n\n  Did not output to file. All employees have been "
                       "allocated rooms.")
                 return "Did not output to file. All allocated"
@@ -413,8 +416,8 @@ class Amity(object):
             else:
                 self.create_files_directory()
 
-                with open(self.files_directory_path + file_name, 'w+') as file:
-                    if len(unallocated_offices) > 0:
+                with open(files_directory_path + file_name, 'w+') as file:
+                    if unallocated_offices:
                         file.write("EMPLOYEES THAT HAVE NOT BEEN ALLOCATED AN "
                                    "OFFICE: \n\n")
                         for person in unallocated_offices:
@@ -426,7 +429,7 @@ class Amity(object):
 
                         file.write("\n\n\n")
 
-                    if len(unallocated_living_spaces) > 0:
+                    if unallocated_living_spaces:
                         file.write("FELLOWS THAT HAVE NOT BEEN ALLOCATED A "
                                    "LIVING SPACE: \n\n")
                         for person in unallocated_living_spaces:
@@ -443,7 +446,7 @@ class Amity(object):
                        file_name))
                 return 'Write to file complete'
 
-        elif len(unallocated_persons) == 0:
+        elif not unallocated_persons:
             return "All allocated"
 
         else:
@@ -482,14 +485,208 @@ class Amity(object):
         return "Room printed successfully"
 
     def save_state(self, database_name=None):
-        pass
+        if not Amity.persons and not Amity.rooms:
+            print("\n  Cannot save state. No rooms or persons have been "
+                  "added.")
+            return "No data"
+
+        self.create_databases_directory()
+        if not database_name:
+            database_name = 'Amity.sqlite3'
+        else:
+            database_name += '.sqlite3'
+
+        if not path.isfile(databases_directory_path + database_name):
+            self.save_to_database_tables(database_name)
+
+        else:
+            remove(databases_directory_path + database_name)
+            self.save_to_database_tables(database_name)
+
+        print("\n  The current Amity state has been saved to '{}'".format(
+            database_name))
+
+        return "State saved to {} successfully".format(database_name)
 
     def load_state(self, database_name=None):
-        pass
 
-    def create_files_directory(self):
-        if not path.exists(self.files_directory_path):
-            mkdir(self.files_directory_path)
+        self.create_databases_directory()
+        if not database_name:
+            database_name = 'Amity.sqlite3'
+        else:
+            database_name += '.sqlite3'
+
+        if not path.isfile(databases_directory_path + database_name):
+            print("\n  Database '{}' does not exist. Try a different "
+                  "name".format(database_name))
+            return "Database does not exist"
+
+        conn = sqlite3.connect(databases_directory_path + database_name)
+        cur = conn.cursor()
+
+        cur.execute('''SELECT * FROM Amity_employees''')
+        amity_employees = cur.fetchall()
+
+        cur.execute('''SELECT * FROM Amity_rooms''')
+        amity_rooms = cur.fetchall()
+
+        conn.close()
+
+        error = colored("\n  ERROR:", 'red')
+
+        if amity_employees:
+            for row in amity_employees:
+                if row[4] == "STAFF":
+                    if row[1] not in [person.employee_id for person in
+                                      Amity.persons]:
+                        staff_object = Staff(row[2], row[3])
+                        staff_object.employee_id = row[1]
+                        staff_object.office_allocated = row[5]
+                        self.staff.append(staff_object)
+                        self.persons.append(staff_object)
+                        print("\n  Staff {} has been loaded "
+                              "successfully".format(staff_object))
+                        sleep(0.2)
+
+                    else:
+                        print("\n  {} Could not load staff {} successfully. "
+                              "They already exists in the current session. "
+                              "Always load state first before adding rooms "
+                              "or persons".format(error, row[2] + ' '
+                                                  + row[3]))
+
+                elif row[4] == "FELLOW":
+                    if row[1] not in [person.employee_id for person in
+                                      Amity.persons]:
+                        fellow_object = Fellow(row[2], row[3], row[6])
+                        fellow_object.employee_id = row[1]
+                        fellow_object.office_allocated = row[5]
+                        fellow_object.living_space_allocated = row[7]
+                        self.fellows.append(fellow_object)
+                        self.persons.append(fellow_object)
+                        print("\n  Fellow {} has been loaded "
+                              "successfully".format(fellow_object))
+                        sleep(0.2)
+
+                    else:
+                        print("\n  {} Could not load fellow {} successfully. "
+                              "They already exists in the current session. "
+                              "Always load state first before adding rooms "
+                              "or persons".format(error, row[2] + ' '
+                                                  + row[3]))
+
+        if amity_rooms:
+            for row in amity_rooms:
+                if row[2] == "OFFICE":
+                    if row[1] not in [room.name for room in Amity.rooms]:
+                        office_object = Office(row[1])
+                        office_object.current_occupancy = row[3]
+                        self.offices.append(office_object)
+                        self.rooms.append(office_object)
+                        print("\n  Office {} has been loaded "
+                              "successfully".format(office_object))
+                        sleep(0.2)
+
+                    else:
+                        colored_message = colored(
+                            " Could not load office {} successfully. It "
+                            "already exists in the current session. It's "
+                            "always better to load state first before adding "
+                            "rooms or persons".format(row[1]), 'yellow'
+                        )
+                        print(error + colored_message)
+
+                elif row[2] == "LIVING SPACE":
+                    if row[1] not in [room.name for room in Amity.rooms]:
+                        living_space_object = LivingSpace(row[1])
+                        living_space_object.current_occupancy = row[3]
+                        self.living_spaces.append(living_space_object)
+                        self.rooms.append(living_space_object)
+                        print("\n  Living Space {} has been loaded "
+                              "successfully".format(living_space_object))
+                        sleep(0.2)
+
+                    else:
+                        colored_message = colored(
+                            " Could not load living space {} successfully. It "
+                            "already exists in the current session. It's "
+                            "always better to load state first before adding "
+                            "rooms or persons".format(row[1]), 'yellow'
+                        )
+                        print(error + colored_message)
+
+        if not amity_rooms and not amity_employees:
+            print("\n  No data to load from {}".format(database_name))
+            return "No data to load"
+
+        print("\n\n  [All non-duplicate data from '{}' has been loaded "
+              "successfully]".format(database_name))
+
+        return "State loaded from {} successfully".format(database_name)
+
+    @staticmethod
+    def create_files_directory():
+        if not path.exists(files_directory_path):
+            mkdir(files_directory_path)
+
+    @staticmethod
+    def create_databases_directory():
+        if not path.exists(databases_directory_path):
+            mkdir(databases_directory_path)
+
+    @staticmethod
+    def save_to_database_tables(database_name):
+        conn = sqlite3.connect(databases_directory_path + database_name)
+        cur = conn.cursor()
+
+        cur.execute('''CREATE TABLE IF NOT EXISTS Amity_employees
+                                (ID INTEGER PRIMARY KEY NOT NULL ,
+                                Employee_ID INTEGER NOT NULL UNIQUE,
+                                First_name TEXT NOT NULL,
+                                Second_name TEXT NOT NULL,
+                                Designation TEXT NOT NULL,
+                                Office_allocated TEXT,
+                                Wants_accommodation TEXT,
+                                Living_space_allocated TEXT)''')
+
+        cur.execute('''CREATE TABLE IF NOT EXISTS Amity_rooms
+                                        (Id INTEGER PRIMARY KEY,
+                                        Room_name TEXT NOT NULL UNIQUE,
+                                        Room_type TEXT NOT NULL,
+                                        Current_occupancy INTEGER NOT NULL)''')
+
+        if Amity.rooms:
+            for room in Amity.rooms:
+                cur.execute('''INSERT INTO Amity_rooms(Room_name, Room_type,
+                            Current_occupancy) VALUES(?, ?, ?)''',
+                            (room.name, room.room_type,
+                             room.current_occupancy))
+
+        if Amity.fellows:
+            for fellow in Amity.fellows:
+                cur.execute('''INSERT INTO Amity_employees(Employee_ID,
+                            First_name, Second_name, Designation,
+                            Office_allocated, Wants_accommodation,
+                            Living_space_allocated)
+                            VALUES(?, ?, ?, ?, ?, ?, ?)''',
+                            (fellow.employee_id, fellow.first_name,
+                             fellow.second_name, fellow.designation,
+                             fellow.office_allocated,
+                             fellow.wants_accommodation,
+                             fellow.living_space_allocated))
+
+        if Amity.staff:
+            for staff in Amity.staff:
+                cur.execute('''INSERT INTO Amity_employees(Employee_ID,
+                            First_name, Second_name, Designation,
+                            Office_allocated)
+                            VALUES(?, ?, ?, ?, ?)''',
+                            (staff.employee_id, staff.first_name,
+                             staff.second_name, staff.designation,
+                             staff.office_allocated))
+
+        conn.commit()
+        conn.close()
 
     @staticmethod
     def generate_id():
