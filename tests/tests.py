@@ -68,6 +68,12 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(len(Amity.offices), self.initial_office_count + 2)
         self.assertEqual(len(Amity.living_spaces),
                          self.initial_living_space_count + 2)
+        self.assertEqual(self.amity.create_room('shell', 'livingspace'),
+                         "Duplicate entry")
+        self.assertEqual(self.amity.create_room('hello', 'livispace'),
+                         "Invalid room type")
+        self.assertEqual(self.amity.create_room('ag@in', 'livingspace'),
+                         "Invalid room name")
         self.assertIn('GO', [room.name for room in Amity.offices])
 
     def test_add_staff(self):

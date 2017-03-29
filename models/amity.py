@@ -41,10 +41,12 @@ class Amity(object):
             else:
                 print("\n  Invalid room type {}. Type help for usage "
                       "instructions".format(room_type))
+                return "Invalid room type"
 
         else:
             print("\n  Invalid room name {}. Name should only consist of "
                   "alphabetical characters".format(name))
+            return "Invalid room name"
 
     def add_staff(self, first_name, second_name):
         check_result = Amity.check_duplicate_name(first_name, second_name)
