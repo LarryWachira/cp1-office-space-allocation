@@ -7,8 +7,8 @@ Usage:
     app.py print_allocations [-o <file_name>]
     app.py print_unallocated [-o <file_name>]
     app.py print room <room_name>
-    app.py save_state [--db=<sqlite_database>]
-    app.py load_state <sqlite_database>
+    app.py save_state [--db <database_name>]
+    app.py load_state [--db <database_name>]
     app.py help
     app.py (-i | --interactive)
     app.py (-h | --help)
@@ -22,6 +22,9 @@ Options:
 import cmd
 import sys
 from time import sleep
+
+from termcolor import cprint, colored
+from colorama import init
 
 from docopt import docopt, DocoptExit
 from pyfiglet import Figlet
@@ -61,9 +64,9 @@ def docopt_cmd(func):
 
 
 class AmityApp(cmd.Cmd):
-    intro = '\n\t\t\t\tWelcome to Amity!\n\t    -Type help for a list of ' \
-            'instructions on how to use the app-'
-    prompt = '\n\nAmity >> '
+    intro = colored('\n\t\t\t\tWelcome to Amity!\n\t    -Type help for a '
+                    'list of instructions on how to use the app-', 'green')
+    prompt = colored('\n\nAmity >> ', 'magenta')
     amity = Amity()
 
     @docopt_cmd
@@ -169,13 +172,30 @@ Options:
 
     @docopt_cmd
     def do_save(self, arg):
-        """Usage: save state [--db=sqlite_database]"""
-        pass
+        """Usage: save state [--db <database_name>]
+
+Options:
+    --db <database_name>  Save to specified database(default is set to 'Amity')
+        """
+        if arg['--db']:
+            self.amity.save_state(arg['--db'])
+
+        else:
+            self.amity.save_state()
 
     @docopt_cmd
     def do_load(self, arg):
-        """Usage: load state <sqlite_database>"""
-        pass
+        """Usage: load state [--db <sqlite_database>]
+
+Options:
+    --db <database_name>  Load from specified database(default is set to
+    'Amity')
+        """
+        if arg['--db']:
+            self.amity.load_state(arg['--db'])
+
+        else:
+            self.amity.load_state()
 
     @docopt_cmd
     def do_help(self, arg):
@@ -204,10 +224,10 @@ Options:
     def do_exit(self, arg):
         """Usage: exit"""
         print('\n\n' + '*' * 60 + '\n')
-        print('\t\tThank you for using Amity!\n')
+        cprint('\t\tThank you for using Amity!\n', 'green')
         print('*' * 60)
         style = Figlet(font='pebbles')
-        print(style.renderText('Good Bye!'))
+        cprint(style.renderText('Good Bye!'), 'magenta')
         exit()
 
 
@@ -215,11 +235,12 @@ opt = docopt(__doc__, sys.argv[1:] + ['-i'], version=1.0)
 
 if opt['--interactive']:
     try:
+        init()
         print('\n')
         style = Figlet(font='dotmatrix')
-        print(style.renderText('Amity'))
+        cprint(style.renderText('Amity'), 'magenta')
         print('*' * 65)
-        print(__doc__)
+        cprint(__doc__, 'yellow')
         AmityApp().cmdloop()
     except KeyboardInterrupt:
         print("\n\tExiting App")
