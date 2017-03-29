@@ -5,6 +5,7 @@ import unittest
 from models.amity import Amity
 from models.persons import Staff, Fellow
 from models.rooms import Office, LivingSpace
+from models.config import files_directory_path, databases_directory_path
 
 
 class TestAmity(unittest.TestCase):
@@ -52,11 +53,9 @@ class TestAmity(unittest.TestCase):
 
         self.saved_id = None
         if Path('./models/.id.txt').is_file():
-            print('Yayyy!')
             with open('./models/.id.txt', "r") as current_id:
                 self.saved_id = current_id.read()
         else:
-            print("Wuhhhh!")
             with open('./models/.id.txt', "w+") as person_id:
                 person_id.write("4")
 
@@ -106,9 +105,9 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(len(Amity.fellows), self.initial_fellow_count + 4)
         self.assertEqual(len(Amity.staff), self.initial_staff_count + 3)
         self.assertEqual('Non-existent file', self.amity.load_people(
-            'people.txt'))
+            'test_people.txt'))
         self.assertEqual("Invalid file", self.amity.load_people('people.mp3'))
-        remove(Amity.files_directory_path + 'test_sample.txt')
+        remove(files_directory_path + 'test_sample.txt')
 
     def test_reallocate_person(self):
         message = "Employee ID does not exist"
@@ -121,7 +120,7 @@ class TestAmity(unittest.TestCase):
         message = 'Allocations printed and saved to file successfully'
         self.assertEqual(self.amity.print_allocations('test_allocated.txt'),
                          message)
-        remove(Amity.files_directory_path + "test_allocated.txt")
+        remove(files_directory_path + "test_allocated.txt")
 
     def test_print_unallocated(self):
         self.assertEqual(self.amity.print_unallocated(), "Finished")
@@ -134,7 +133,7 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(self.amity.print_unallocated('unallocated.txt'),
                          'Did not output to file. All allocated')
         self.assertEqual(self.amity.print_unallocated(), 'All allocated')
-        remove(Amity.files_directory_path + "test_unallocated.txt")
+        remove(files_directory_path + "test_unallocated.txt")
 
     def test_print_room(self):
 
@@ -143,16 +142,23 @@ class TestAmity(unittest.TestCase):
                                                         "successfully")
 
     def test_save_state(self):
-        self.assertEqual(self.amity.save_state(), "State saved successfully")
+        self.assertEqual(self.amity.save_state(), "State saved to "
+                                                  "Amity.sqlite3 "
+                                                  "successfully")
         self.assertEqual(self.amity.save_state("February"), "State saved to "
-                                                            "specified db"
+                                                            "February.sqlite3 "
                                                             "successfully")
+        Amity.rooms = []
+        Amity.persons = []
+        self.assertEqual(self.amity.save_state(), "No data")
+        remove("./databases/February.sqlite3")
 
     def test_load_state(self):
-        self.assertEqual(self.amity.load_state(), "State loaded successfully")
-        self.assertEqual(self.amity.load_state("March"), "State loaded from "
-                                                         "specified db "
-                                                         "successfully")
+        self.assertEqual(self.amity.load_state(), "State loaded "
+                                                  "from Amity.sqlite3 "
+                                                  "successfully")
+        self.assertEqual(self.amity.load_state("March"), "Database does not "
+                                                         "exist")
 
     def tearDown(self):
         if self.saved_id:
