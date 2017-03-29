@@ -8,6 +8,9 @@ exclude_lines =
 
 
 [run]
-source = ../models/
+source = ../models
 
-omit = /usr/*
+omit =
+    /usr/*
+    tests.py
+    *termcolor.py
