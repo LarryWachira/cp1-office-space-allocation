@@ -23,12 +23,29 @@ are enclosed in square brackets.
 
 --------------------------------------------------------
 
-## Installation
+## Setting up Amity
 The app has a number of dependencies as detailed in the `requirements.txt`. To run it, you'll need to install [Python 3.6](http://python.org) from Python's website and setup a virtual environment as illustrated [here](http://docs.python-guide.org/en/latest/dev/virtualenvs/). Dependencies that are built into Python have not been included.
 
-The last and final step will be to install the dependencies by typing `pip install -r requirements.txt`
 
-With that done and git installed on your system, all you need to do now is to clone the repo via the command `git clone https://github.com/LarryWachira/cp1-office-space-allocation.git` and run `python app.py` in your command line to fire up the app.
+### Prerequisites
+
+The code is written in Python 3.
+
+### Installing
+
+Clone the repository from GitHub:
+
+`git clone https://github.com/LarryWachira/cp1-office-space-allocation.git`
+
+Change Directory into the project folder
+
+`cd cp1-office-space-allocation`
+
+Install the dependencies from requirements.txt
+
+`pip install -r requirements.txt`
+
+The last and final is simply to run `python app.py` on your command line to fire up the app.
 
 --------------------------------------------------------
 
