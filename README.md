@@ -5,7 +5,7 @@
 Amity is a room allocation command line application with key essential features written in Python.
 You can add people, add rooms, print allocations and unallocated data and also reallocate employees. What's more, Amity also allows you to backup to a specified text file or sqlite database of your choosing.
 
-Here's a commands list highlighting all of it's current features:
+Here's a commands list highlighting all of its current features:
 
 ## Usage:
 1.  create room <room_type> <room_name> ...
