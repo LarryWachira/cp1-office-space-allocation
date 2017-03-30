@@ -11,7 +11,7 @@ branches:
   only:
     - master
 
-script: nosetests --with-coverage
+script: nosetests --with-coverage -v --cover-package=models
 
 after_success: coveralls
 
