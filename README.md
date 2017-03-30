@@ -29,9 +29,6 @@ are enclosed in square brackets.
 The app has a number of dependencies as detailed in the `requirements.txt`. To run it, you'll need to install [Python 3.6](http://python.org) from Python's website and setup a virtual environment as illustrated [here](http://docs.python-guide.org/en/latest/dev/virtualenvs/). Dependencies that are built into Python have not been included.
 
 
-### Prerequisites
-
-The code is written in Python 3.
 
 ### Installing
 
@@ -52,3 +49,7 @@ The last and final is simply to run `python app.py` on your command line to fire
 --------------------------------------------------------
 
 
+To run tests, just run the following command on the terminal:
+
+`nosetests --with-coverage -v --cover-package=models
+`
