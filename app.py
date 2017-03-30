@@ -1,12 +1,13 @@
 """
 Usage:
-    app.py create room <room_type> <room_name> ...
-    app.py add person <designation> <first_name> <second_name> \
+    app.py create_room <room_type> <room_name> ...
+    app.py add_person <designation> <first_name> <second_name> \
 [-a <wants_accommodation>]
-    app.py reallocate person <employee_id> <new_room_name>
+    app.py reallocate_person <employee_id> <new_room_name>
     app.py print_allocations [-o <file_name>]
     app.py print_unallocated [-o <file_name>]
-    app.py print room <room_name>
+    app.py print_room <room_name>
+    app.py load_people <file_name>
     app.py save_state [--db <database_name>]
     app.py load_state [--db <database_name>]
     app.py help
@@ -70,8 +71,8 @@ class AmityApp(cmd.Cmd):
     amity = Amity()
 
     @docopt_cmd
-    def do_create(self, args):
-        """Usage: create room <room_type> <room_name>..."""
+    def do_create_room(self, args):
+        """Usage: create_room <room_type> <room_name>..."""
         room_type = args['<room_type>']
         room_list = args['<room_name>']
 
@@ -80,9 +81,9 @@ class AmityApp(cmd.Cmd):
             sleep(0.2)
 
     @docopt_cmd
-    def do_add(self, args):
+    def do_add_person(self, args):
         """
-        Usage: add person <designation> <first_name> <second_name> \
+        Usage: add_person <designation> <first_name> <second_name> \
 [-a <wants_accommodation>]
 
 Options:
@@ -115,8 +116,8 @@ Options:
                   "either 'Staff' or 'Fellow'")
 
     @docopt_cmd
-    def do_reallocate(self, args):
-        """Usage: reallocate person <employee_id> <new_room_name>"""
+    def do_reallocate_person(self, args):
+        """Usage: reallocate_person <employee_id> <new_room_name>"""
 
         employee_id = args['<employee_id>']
         new_room_name = args['<new_room_name>']
@@ -158,8 +159,8 @@ Options:
             self.amity.print_unallocated()
 
     @docopt_cmd
-    def do_print(self, arg):
-        """Usage: print room <room_name>"""
+    def do_print_room(self, arg):
+        """Usage: print_room <room_name>"""
 
         room_name = arg['<room_name>']
 
@@ -171,8 +172,8 @@ Options:
                   "alphabetical characters only")
 
     @docopt_cmd
-    def do_save(self, arg):
-        """Usage: save state [--db <database_name>]
+    def do_save_state(self, arg):
+        """Usage: save_state [--db <database_name>]
 
 Options:
     --db <database_name>  Save to specified database(default is set to 'Amity')
@@ -184,8 +185,8 @@ Options:
             self.amity.save_state()
 
     @docopt_cmd
-    def do_load(self, arg):
-        """Usage: load state [--db <sqlite_database>]
+    def do_load_state(self, arg):
+        """Usage: load_state [--db <sqlite_database>]
 
 Options:
     --db <database_name>  Load from specified database(default is set to
@@ -209,6 +210,7 @@ Options:
    print_allocations [-o=allocations.txt]
    print_unallocated [-o=unallocated.txt]
    print room <room_name>
+   load_people <file_name>
    save_state [--db=sqlite_database]
    load_state <sqlite_database>
    help
