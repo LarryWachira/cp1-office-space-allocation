@@ -3,7 +3,7 @@ from random import choice
 from time import sleep
 import sqlite3
 
-from termcolor import colored, cprint
+from termcolor import colored
 
 from models.persons import Staff, Fellow
 from models.rooms import Office, LivingSpace
@@ -71,9 +71,11 @@ class Amity(object):
             return message
 
         else:
-            message = "No empty offices available. Staff {} has not been " \
-                      "allocated".format(staff_object)
+            message = "No empty offices available. Staff {} has been " \
+                      "added but has not been allocated an office".format(
+                       staff_object)
             print("\n  ", message)
+            return message
 
     def add_fellow(self, first_name, second_name, wants_accommodation='N'):
         check_result = Amity.check_duplicate_name(first_name, second_name)
@@ -98,8 +100,9 @@ class Amity(object):
             print('\n  ', message)
 
         else:
-            message = "No empty offices available. Fellow {} has not been " \
-                      "allocated".format(fellow_object)
+            message = "No empty offices available. Fellow {} has been " \
+                      "added but has not been allocated an office".format(
+                       fellow_object)
             print("\n  ", message)
 
         if wants_accommodation.upper() == "Y":
@@ -118,7 +121,8 @@ class Amity(object):
 
             else:
                 message = "No empty living spaces available. Fellow {} has " \
-                          "not been allocated".format(fellow_object)
+                          "not been allocated a living space".format(
+                           fellow_object)
                 print("\n  ", message)
                 return message
 
@@ -158,6 +162,12 @@ class Amity(object):
                     new_office = room
                     break
 
+            if new_office.name == person_to_be_reallocated.office_allocated:
+                print("\n  {} {} is already allocated to {}".format(
+                    person_to_be_reallocated.designation,
+                    person_to_be_reallocated, new_office.name))
+                return "Already in office"
+
             if not new_office.free_spaces():
                 print("\n  Cannot reallocate {}. New office {} is full "
                       "to capacity".format(person_to_be_reallocated,
@@ -177,19 +187,13 @@ class Amity(object):
                     old_office = room
                     break
 
-            if new_office.name == old_office.name:
-                print("\n  {} {} is already allocated to {}".format(
-                    person_to_be_reallocated.designation,
-                    person_to_be_reallocated, new_office.name))
-                return "Already in office"
-
             old_office.current_occupancy -= 1
             new_office.current_occupancy += 1
             person_to_be_reallocated.office_allocated = new_office.name
             print("\n  Employee {} has been moved to the Office {} from {}"
                   .format(person_to_be_reallocated, new_office,
                           old_office))
-            return "Employee reallocated"
+            return "Person reallocated"
 
         if new_room_name.upper() in [room.name for room in self.living_spaces]:
             for fellow in self.fellows:
@@ -205,6 +209,14 @@ class Amity(object):
                 if room.name == new_room_name.upper():
                     new_living_space = room
                     break
+
+            if new_living_space.name == \
+                    fellow_to_be_reallocated.living_space_allocated:
+                print("\n  {} {} is already allocated to {}".format(
+                    fellow_to_be_reallocated.designation,
+                    fellow_to_be_reallocated,
+                    new_living_space.name))
+                return "Already in living space"
 
             if not new_living_space.free_spaces():
                 print("\n  Cannot reallocate {}. New living space {} is "
@@ -226,13 +238,6 @@ class Amity(object):
                         room.name:
                     old_living_space = room
                     break
-
-            if new_living_space.name == old_living_space.name:
-                print("\n  {} {} is already allocated to {}".format(
-                    fellow_to_be_reallocated.designation,
-                    fellow_to_be_reallocated,
-                    new_living_space.name))
-                return "Already in living space"
 
             old_living_space.current_occupancy -= 1
             new_living_space.current_occupancy += 1
@@ -275,8 +280,8 @@ class Amity(object):
                                             person_details[1])
                             sleep(0.2)
 
-                message = "People added from file successfully"
-                print('\n\n\t\t', message, "\n")
+                message = "People loaded from file successfully"
+                print('\n\n\t\t\t', message)
                 return message
 
         except FileNotFoundError:
@@ -375,15 +380,16 @@ class Amity(object):
             return 'Finished'
 
     def print_unallocated(self, file_name=None):
+        if not self.persons:
+            print("\n  No employees have been added")
+            return "No employees"
+
         unallocated_offices = [person for person in self.persons if
                                person.office_allocated is None]
 
         if unallocated_offices:
             print('\n  Persons that have not been allocated an office:')
             Amity.print_allocations_list_procedure(unallocated_offices)
-        elif not self.persons:
-            print("\n  No employees have been added")
-            return "No employees"
         else:
             print("\n  All employees have been allocated offices")
 
@@ -725,17 +731,20 @@ class Amity(object):
 
     @staticmethod
     def verify_id_and_new_room_values(employee_id, new_room_name):
-        if type(int(employee_id)) != int:
+        try:
+            int(employee_id)
+        except ValueError:
             print("\n  Employee ID is not a number")
             return "Invalid ID"
 
-        elif not new_room_name.isalpha():
-            print("\n  Invalid new room name. Room name should consist of "
-                  "only alphabetical characters")
-            return "Invalid new room name"
-
         else:
-            return
+            if not new_room_name.isalpha():
+                print("\n  Invalid new room name. Room name should consist of "
+                      "only alphabetical characters")
+                return "Invalid new room name"
+
+            else:
+                return
 
     @staticmethod
     def check_duplicate_name(first_name, second_name):
@@ -752,4 +761,3 @@ class Amity(object):
             print("\n  Invalid person name. Both the first name and second "
                   "name should consist of alphabetical characters.")
             return "Invalid"
-
