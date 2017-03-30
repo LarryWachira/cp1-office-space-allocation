@@ -1,4 +1,5 @@
-
+[![Build Status](https://travis-ci.org/LarryWachira/cp1-office-space-allocation.svg?branch=master)](https://travis-ci.org/LarryWachira/cp1-office-space-allocation)
+[![Coverage Status](https://coveralls.io/repos/github/LarryWachira/cp1-office-space-allocation/badge.svg?branch=master)](https://coveralls.io/github/LarryWachira/cp1-office-space-allocation?branch=master)
 # Amity:
 ## A room allocation system for one of Andela’s facilities
 
@@ -8,15 +9,16 @@ You can add people, add rooms, print allocations and unallocated data and also r
 Here's a commands list highlighting all of its current features:
 
 ## Usage:
-1.  create room <room_type> <room_name> ...
-2.  add person <designation> <first_name> <second_name> [-a <wants_accommodation>]
-3.  reallocate person <employee_id> <new_room_name>
+1.  create_room <room_type> <room_name> ...
+2.  add_person <designation> <first_name> <second_name> [-a <wants_accommodation>]
+3.  reallocate_person <employee_id> <new_room_name>
 4.  print_allocations [-o <file_name>]
 5.  print_unallocated [-o <file_name>]
-6.  print room <room_name>
-7.  save_state [--db <database_name>]
-8.  load_state [--db <database_name>]
-9.  help
+6.  print_room <room_name>
+7.  load_people <file_name>
+8.  save_state [--db <database_name>]
+9.  load_state [--db <database_name>]
+10.  help
 
 Features that require arguments of one type or another are indicated in angle brackets while optional arguments
 are enclosed in square brackets.
