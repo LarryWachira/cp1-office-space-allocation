@@ -238,6 +238,7 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(self.amity.save_state(), "State saved to "
                                                   "Amity.sqlite3 "
                                                   "successfully")
+
         remove(databases_directory_path + 'Amity.sqlite3')
 
         if Path(databases_directory_path + 'Amity_backup.sqlite3').is_file():
@@ -254,9 +255,14 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(self.amity.save_state(), "No data")
 
     def test_load_state(self):
-        self.assertEqual(self.amity.load_state(), "State loaded "
-                                                  "from Amity.sqlite3 "
-                                                  "successfully")
+        if not Path(databases_directory_path + 'Amity.sqlite3').is_file():
+            self.assertEqual(self.amity.load_state(), "Database does not "
+                                                      "exist")
+        else:
+            self.assertEqual(self.amity.load_state(), "State loaded "
+                                                      "from Amity.sqlite3 "
+                                                      "successfully")
+
         self.assertEqual(self.amity.load_state("March"), "Database does not "
                                                          "exist")
 
