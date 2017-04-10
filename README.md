@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fb2cfdf3e2f44a9d9f3cd33f6a9f3118)](https://www.codacy.com/app/LarryWachira/cp1-office-space-allocation?utm_source=github.com&utm_medium=referral&utm_content=LarryWachira/cp1-office-space-allocation&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/LarryWachira/cp1-office-space-allocation.svg?branch=master)](https://travis-ci.org/LarryWachira/cp1-office-space-allocation)
 [![Coverage Status](https://coveralls.io/repos/github/LarryWachira/cp1-office-space-allocation/badge.svg?branch=master)](https://coveralls.io/github/LarryWachira/cp1-office-space-allocation?branch=master)
 # Amity:
