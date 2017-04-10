@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fb2cfdf3e2f44a9d9f3cd33f6a9f3118)](https://www.codacy.com/app/LarryWachira/cp1-office-space-allocation?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=LarryWachira/cp1-office-space-allocation&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.org/LarryWachira/cp1-office-space-allocation.svg?branch=master)](https://travis-ci.org/LarryWachira/cp1-office-space-allocation)
 [![Coverage Status](https://coveralls.io/repos/github/LarryWachira/cp1-office-space-allocation/badge.svg?branch=master)](https://coveralls.io/github/LarryWachira/cp1-office-space-allocation?branch=master)
 # Amity:
@@ -34,15 +35,15 @@ The app has a number of dependencies as detailed in the `requirements.txt`. To r
 
 Clone the repository from GitHub:
 
-`git clone https://github.com/LarryWachira/cp1-office-space-allocation.git`
+`$ git clone https://github.com/LarryWachira/cp1-office-space-allocation.git`
 
 Change Directory into the project folder
 
-`cd cp1-office-space-allocation`
+`$ cd cp1-office-space-allocation`
 
 Install the dependencies from requirements.txt
 
-`pip install -r requirements.txt`
+`$ pip install -r requirements.txt`
 
 The last and final is simply to run `python app.py` on your command line to fire up the app.
 
@@ -51,5 +52,5 @@ The last and final is simply to run `python app.py` on your command line to fire
 
 To run tests, just run the following command on the terminal:
 
-`nosetests --with-coverage -v --cover-package=models
+`$ nosetests --with-coverage -v --cover-package=models
 `
