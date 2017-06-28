@@ -29,7 +29,7 @@ class TestAmity(unittest.TestCase):
         self.staff_2.employee_id = 2
         self.fellow_1.employee_id = 3
         self.fellow_2.employee_id, self.fellow_2.office_allocated = 4, \
-                                                                    "OCCULUS"
+            "OCCULUS"
         self.fellow_2.living_space_allocated = "DOJO"
         self.fellow_3.employee_id = 5
 
@@ -37,21 +37,21 @@ class TestAmity(unittest.TestCase):
         self.office_2.current_occupancy = 1
         self.living_space_1.current_occupancy = 1
 
-        Amity.rooms = [self.office_1, self.office_2, self.living_space_1,
-                       self.living_space_2]
-        Amity.offices = [self.office_1, self.office_2]
-        Amity.living_spaces = [self.living_space_2, self.living_space_1]
-        Amity.persons = [self.staff_1, self.staff_2, self.fellow_1,
-                         self.fellow_2, self.fellow_3]
-        Amity.staff = [self.staff_2, self.staff_1]
-        Amity.fellows = [self.fellow_2, self.fellow_1, self.fellow_3]
+        self.amity.rooms = [self.office_1, self.office_2, self.living_space_1,
+                            self.living_space_2]
+        self.amity.offices = [self.office_1, self.office_2]
+        self.amity.living_spaces = [self.living_space_2, self.living_space_1]
+        self.amity.persons = [self.staff_1, self.staff_2, self.fellow_1,
+                              self.fellow_2, self.fellow_3]
+        self.amity.staff = [self.staff_2, self.staff_1]
+        self.amity.fellows = [self.fellow_2, self.fellow_1, self.fellow_3]
 
-        self.initial_room_count = len(Amity.rooms)
-        self.initial_office_count = len(Amity.offices)
-        self.initial_living_space_count = len(Amity.living_spaces)
-        self.initial_persons_count = len(Amity.persons)
-        self.initial_staff_count = len(Amity.staff)
-        self.initial_fellow_count = len(Amity.fellows)
+        self.initial_room_count = len(self.amity.rooms)
+        self.initial_office_count = len(self.amity.offices)
+        self.initial_living_space_count = len(self.amity.living_spaces)
+        self.initial_persons_count = len(self.amity.persons)
+        self.initial_staff_count = len(self.amity.staff)
+        self.initial_fellow_count = len(self.amity.fellows)
 
         self.amity.create_files_directory()
         self.amity.create_databases_directory()
@@ -69,9 +69,10 @@ class TestAmity(unittest.TestCase):
         self.amity.create_room('go', 'o')
         self.amity.create_room('scala', 'l')
         self.amity.create_room('shell', 'livingspace')
-        self.assertEqual(len(Amity.rooms), self.initial_room_count + 4)
-        self.assertEqual(len(Amity.offices), self.initial_office_count + 2)
-        self.assertEqual(len(Amity.living_spaces),
+        self.assertEqual(len(self.amity.rooms), self.initial_room_count + 4)
+        self.assertEqual(len(self.amity.offices),
+                         self.initial_office_count + 2)
+        self.assertEqual(len(self.amity.living_spaces),
                          self.initial_living_space_count + 2)
         self.assertEqual(self.amity.create_room('shell', 'livingspace'),
                          "Duplicate entry")
@@ -79,20 +80,21 @@ class TestAmity(unittest.TestCase):
                          "Invalid room type")
         self.assertEqual(self.amity.create_room('ag@in', 'livingspace'),
                          "Invalid room name")
-        self.assertIn('GO', [room.name for room in Amity.offices])
+        self.assertIn('GO', [room.name for room in self.amity.offices])
 
     def test_add_staff(self):
         self.amity.add_staff('Lawrence', 'Otieno')
         self.amity.add_staff('Lawrence', 'Muchiri')
         self.amity.add_staff('Lawrence', 'Kilonzo')
         self.amity.add_staff('Lawrence', 'Mutiga')
-        self.assertEqual(len(Amity.persons), self.initial_persons_count + 4)
-        self.assertEqual(len(Amity.staff), self.initial_staff_count + 4)
+        self.assertEqual(len(self.amity.persons),
+                         self.initial_persons_count + 4)
+        self.assertEqual(len(self.amity.staff), self.initial_staff_count + 4)
         self.assertEqual(self.amity.add_staff('Lawrence', 'Muchiri'),
                          "Duplicate entry")
         self.assertIn('ROBERT OPIYO has been allocated the office',
                       self.amity.add_staff('Robert', 'Opiyo'))
-        Amity.offices = []
+        self.amity.offices = []
         self.assertEqual(self.amity.add_staff('Lawrence', 'Ndegwa'),
                          "No empty offices available. Staff LAWRENCE NDEGWA "
                          "has been added but has not been allocated an office")
@@ -106,11 +108,13 @@ class TestAmity(unittest.TestCase):
                          "Duplicate entry")
         self.assertEqual(self.amity.add_fellow('M0rcy', 'Muchiri'),
                          "Invalid")
-        self.assertEqual(len(Amity.persons), self.initial_persons_count + 4)
-        self.assertEqual(len(Amity.fellows), self.initial_fellow_count + 4)
+        self.assertEqual(len(self.amity.persons),
+                         self.initial_persons_count + 4)
+        self.assertEqual(len(self.amity.fellows),
+                         self.initial_fellow_count + 4)
         self.assertIn("Fellow MERCY KIBOI has been allocated the living "
                       "space", self.amity.add_fellow('Mercy', 'Kiboi', 'y'))
-        Amity.living_spaces =[]
+        self.amity.living_spaces = []
         self.assertEqual(self.amity.add_fellow('Lawrence', 'Ndegwa', 'y'),
                          "No empty living spaces available. Fellow LAWRENCE "
                          "NDEGWA has not been allocated a living space")
@@ -129,9 +133,11 @@ class TestAmity(unittest.TestCase):
         message = "People loaded from file successfully"
         self.assertEqual(message, self.amity.load_people('test_sample.txt'))
 
-        self.assertEqual(len(Amity.persons), self.initial_persons_count + 7)
-        self.assertEqual(len(Amity.fellows), self.initial_fellow_count + 4)
-        self.assertEqual(len(Amity.staff), self.initial_staff_count + 3)
+        self.assertEqual(len(self.amity.persons),
+                         self.initial_persons_count + 7)
+        self.assertEqual(len(self.amity.fellows),
+                         self.initial_fellow_count + 4)
+        self.assertEqual(len(self.amity.staff), self.initial_staff_count + 3)
 
         self.assertEqual('Non-existent file', self.amity.load_people(
             'test_load_people.txt'))
@@ -189,11 +195,11 @@ class TestAmity(unittest.TestCase):
         self.assertEqual(self.amity.print_allocations('test_allocated.mp3'),
                          "Invalid filename")
 
-        Amity.rooms = []
+        self.amity.rooms = []
         self.assertEqual(self.amity.print_allocations(), "No rooms have been "
                                                          "created")
 
-        Amity.persons = []
+        self.amity.persons = []
         self.assertEqual(self.amity.print_allocations(), "No Employees have "
                                                          "been added")
 
@@ -216,7 +222,7 @@ class TestAmity(unittest.TestCase):
                          'Did not output to file. All allocated')
         self.assertEqual(self.amity.print_unallocated(), 'All allocated')
 
-        Amity.persons = []
+        self.amity.persons = []
         self.assertEqual(self.amity.print_unallocated(), 'No employees')
 
     def test_print_room(self):
@@ -250,8 +256,8 @@ class TestAmity(unittest.TestCase):
                                                             "successfully")
         remove("./databases/February.sqlite3")
 
-        Amity.rooms = []
-        Amity.persons = []
+        self.amity.rooms = []
+        self.amity.persons = []
         self.assertEqual(self.amity.save_state(), "No data")
 
     def test_load_state(self):
@@ -259,9 +265,10 @@ class TestAmity(unittest.TestCase):
             self.assertEqual(self.amity.load_state(), "Database does not "
                                                       "exist")
         else:
-            self.assertEqual(self.amity.load_state(), "State loaded "
-                                                      "from Amity.sqlite3 "
-                                                      "successfully")
+            self.assertIn(self.amity.load_state(), ["State loaded "
+                                                    "from Amity.sqlite3 "
+                                                    "successfully",
+                                                    "No data to load"])
 
         self.assertEqual(self.amity.load_state("March"), "Database does not "
                                                          "exist")
