@@ -11,12 +11,14 @@ from models.config import files_directory_path, databases_directory_path
 
 
 class Amity(object):
-    rooms = []
-    living_spaces = []
-    offices = []
-    persons = []
-    staff = []
-    fellows = []
+
+    def __init__(self):
+        self.rooms = []
+        self.living_spaces = []
+        self.offices = []
+        self.persons = []
+        self.staff = []
+        self.fellows = []
 
     def create_room(self, name, room_type):
         if name.isalpha():
@@ -36,7 +38,7 @@ class Amity(object):
                 self.rooms.append(living_space_object)
                 print("\n  Living Space {} has been created".format(
                     name.upper())
-                      )
+                )
 
             else:
                 print("\n  Invalid room type {}. Type help for usage "
@@ -49,7 +51,7 @@ class Amity(object):
             return "Invalid room name"
 
     def add_staff(self, first_name, second_name):
-        check_result = Amity.check_duplicate_name(first_name, second_name)
+        check_result = self.check_duplicate_name(first_name, second_name)
         if check_result in ["Duplicate entry", "Invalid"]:
             return check_result
 
@@ -73,12 +75,12 @@ class Amity(object):
         else:
             message = "No empty offices available. Staff {} has been " \
                       "added but has not been allocated an office".format(
-                       staff_object)
+                          staff_object)
             print("\n  ", message)
             return message
 
     def add_fellow(self, first_name, second_name, wants_accommodation='N'):
-        check_result = Amity.check_duplicate_name(first_name, second_name)
+        check_result = self.check_duplicate_name(first_name, second_name)
         if check_result in ["Duplicate entry", "Invalid"]:
             return check_result
 
@@ -102,7 +104,7 @@ class Amity(object):
         else:
             message = "No empty offices available. Fellow {} has been " \
                       "added but has not been allocated an office".format(
-                       fellow_object)
+                          fellow_object)
             print("\n  ", message)
 
         if wants_accommodation.upper() == "Y":
@@ -122,7 +124,7 @@ class Amity(object):
             else:
                 message = "No empty living spaces available. Fellow {} has " \
                           "not been allocated a living space".format(
-                           fellow_object)
+                              fellow_object)
                 print("\n  ", message)
                 return message
 
@@ -179,7 +181,7 @@ class Amity(object):
                 person_to_be_reallocated.office_allocated = new_office.name
                 print("\n  Employee {} did not have an office but has now "
                       "been allocated to {}".format(
-                       person_to_be_reallocated, new_office))
+                          person_to_be_reallocated, new_office))
                 return "Person allocated"
 
             for room in self.offices:
@@ -230,7 +232,7 @@ class Amity(object):
                     new_living_space.name
                 print("\n  Fellow {} did not have an living space but has now "
                       "been allocated to {}".format(
-                       fellow_to_be_reallocated, new_living_space))
+                          fellow_to_be_reallocated, new_living_space))
                 return "Fellow allocated"
 
             for room in self.living_spaces:
@@ -373,7 +375,7 @@ class Amity(object):
 
             print("\n\n  Allocated persons saved to '{}' "
                   "successfully. Find it in the 'files' folder".format(
-                   file_name))
+                      file_name))
             return 'Allocations printed and saved to file successfully'
 
         else:
@@ -451,7 +453,7 @@ class Amity(object):
 
                 print("\n\n  Unallocated persons saved to '{}' "
                       "successfully Find it the the 'files' folder".format(
-                       file_name))
+                          file_name))
                 return 'Write to file complete'
 
         elif not unallocated_persons:
@@ -493,7 +495,7 @@ class Amity(object):
         return "Room printed successfully"
 
     def save_state(self, database_name=None):
-        if not Amity.persons and not Amity.rooms:
+        if not self.persons and not self.rooms:
             print("\n  Cannot save state. No rooms or persons have been "
                   "added.")
             return "No data"
@@ -546,7 +548,7 @@ class Amity(object):
             for row in amity_employees:
                 if row[4] == "STAFF":
                     if row[1] not in [person.employee_id for person in
-                                      Amity.persons]:
+                                      self.persons]:
                         staff_object = Staff(row[2], row[3])
                         staff_object.employee_id = row[1]
                         staff_object.office_allocated = row[5]
@@ -558,14 +560,14 @@ class Amity(object):
 
                     else:
                         print("\n  {} Could not load staff {} successfully. "
-                              "They already exists in the current session. "
+                              "They already exist in the current session. "
                               "Always load state first before adding rooms "
                               "or persons".format(error, row[2] + ' '
                                                   + row[3]))
 
                 elif row[4] == "FELLOW":
                     if row[1] not in [person.employee_id for person in
-                                      Amity.persons]:
+                                      self.persons]:
                         fellow_object = Fellow(row[2], row[3], row[6])
                         fellow_object.employee_id = row[1]
                         fellow_object.office_allocated = row[5]
@@ -578,7 +580,7 @@ class Amity(object):
 
                     else:
                         print("\n  {} Could not load fellow {} successfully. "
-                              "They already exists in the current session. "
+                              "They already exist in the current session. "
                               "Always load state first before adding rooms "
                               "or persons".format(error, row[2] + ' '
                                                   + row[3]))
@@ -586,7 +588,7 @@ class Amity(object):
         if amity_rooms:
             for row in amity_rooms:
                 if row[2] == "OFFICE":
-                    if row[1] not in [room.name for room in Amity.rooms]:
+                    if row[1] not in [room.name for room in self.rooms]:
                         office_object = Office(row[1])
                         office_object.current_occupancy = row[3]
                         self.offices.append(office_object)
@@ -605,7 +607,7 @@ class Amity(object):
                         print(error + colored_message)
 
                 elif row[2] == "LIVING SPACE":
-                    if row[1] not in [room.name for room in Amity.rooms]:
+                    if row[1] not in [room.name for room in self.rooms]:
                         living_space_object = LivingSpace(row[1])
                         living_space_object.current_occupancy = row[3]
                         self.living_spaces.append(living_space_object)
@@ -632,18 +634,22 @@ class Amity(object):
 
         return "State loaded from {} successfully".format(database_name)
 
-    @staticmethod
-    def create_files_directory():
-        if not path.exists(files_directory_path):
-            mkdir(files_directory_path)
+    def check_duplicate_name(self, first_name, second_name):
+        if first_name.isalpha() and second_name.isalpha():
+            for person in self.persons:
+                if person.first_name == first_name.upper() and \
+                        person.second_name == second_name.upper():
+                    print("\n  The person {} {} already exists.".format(
+                        first_name.upper(), second_name.upper()))
+                    return "Duplicate entry"
+            return
 
-    @staticmethod
-    def create_databases_directory():
-        if not path.exists(databases_directory_path):
-            mkdir(databases_directory_path)
+        else:
+            print("\n  Invalid person name. Both the first name and second "
+                  "name should consist of alphabetical characters.")
+            return "Invalid"
 
-    @staticmethod
-    def save_to_database_tables(database_name):
+    def save_to_database_tables(self, database_name):
         conn = sqlite3.connect(databases_directory_path + database_name)
         cur = conn.cursor()
 
@@ -663,15 +669,15 @@ class Amity(object):
                                         Room_type TEXT NOT NULL,
                                         Current_occupancy INTEGER NOT NULL)''')
 
-        if Amity.rooms:
-            for room in Amity.rooms:
+        if self.rooms:
+            for room in self.rooms:
                 cur.execute('''INSERT INTO Amity_rooms(Room_name, Room_type,
                             Current_occupancy) VALUES(?, ?, ?)''',
                             (room.name, room.room_type,
                              room.current_occupancy))
 
-        if Amity.fellows:
-            for fellow in Amity.fellows:
+        if self.fellows:
+            for fellow in self.fellows:
                 cur.execute('''INSERT INTO Amity_employees(Employee_ID,
                             First_name, Second_name, Designation,
                             Office_allocated, Wants_accommodation,
@@ -683,8 +689,8 @@ class Amity(object):
                              fellow.wants_accommodation,
                              fellow.living_space_allocated))
 
-        if Amity.staff:
-            for staff in Amity.staff:
+        if self.staff:
+            for staff in self.staff:
                 cur.execute('''INSERT INTO Amity_employees(Employee_ID,
                             First_name, Second_name, Designation,
                             Office_allocated)
@@ -695,6 +701,16 @@ class Amity(object):
 
         conn.commit()
         conn.close()
+
+    @staticmethod
+    def create_files_directory():
+        if not path.exists(files_directory_path):
+            mkdir(files_directory_path)
+
+    @staticmethod
+    def create_databases_directory():
+        if not path.exists(databases_directory_path):
+            mkdir(databases_directory_path)
 
     @staticmethod
     def generate_id():
@@ -745,19 +761,3 @@ class Amity(object):
 
             else:
                 return
-
-    @staticmethod
-    def check_duplicate_name(first_name, second_name):
-        if first_name.isalpha() and second_name.isalpha():
-            for person in Amity.persons:
-                if person.first_name == first_name.upper() and \
-                                person.second_name == second_name.upper():
-                    print("\n  The person {} {} already exists.".format(
-                        first_name.upper(), second_name.upper()))
-                    return "Duplicate entry"
-            return
-
-        else:
-            print("\n  Invalid person name. Both the first name and second "
-                  "name should consist of alphabetical characters.")
-            return "Invalid"
